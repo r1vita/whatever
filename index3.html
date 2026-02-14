@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pixel-pink: #ff4d6d;
+            --pixel-green: #00ffcc;
+            --bg-black: #050505;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: white;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        #main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+        #calc-panel {
+            background: #111;
+            padding: 15px;
+            border: 2px solid var(--pixel-green); 
+            margin-bottom: 10px;
+            width: 380px;
+            text-align: left;
+            box-shadow: 5px 5px 0px var(--pixel-green);
+        }
+
+        .math-text { color: var(--pixel-green); font-size: 1rem; margin: 5px 0; text-transform: uppercase; }
+        .val { color: var(--pixel-pink); }
+
+        canvas {
+            background: #000;
+            border: 4px solid white;  
+            box-shadow: 8px 8px 0px #333;
+            max-width: 90vw;
+        }
+
+        #proposal-section {
+            display: none;
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        h1 { font-size: 2rem; margin: 15px 0; color: var(--pixel-pink); text-transform: uppercase; }
+
+        .btn-container {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            min-height: 160px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Share Tech Mono', monospace;
+            border: 4px solid;
+            cursor: pointer;
+            text-transform: uppercase;
+            position: relative;
+            transition: 0.1s;
+        }
+
+        #yes-btn {
+            background-color: var(--pixel-pink);
+            color: white;
+            border-color: #ff8fa3 white white #ff8fa3;
+            box-shadow: 4px 4px 0px #800020;
+        }
+
+        #no-btn {
+            background-color: #444;
+            color: #bbb;
+            border-color: #666 #222 #222 #666;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        #yes-btn:active { box-shadow: 0px 0px 0px; transform: translate(4px, 4px); }
+
+        #success-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        #success-header {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 4px 4px 0px var(--pixel-pink);
+            margin-bottom: 20px;
+        }
+
+        .wide-img-container {
+            width: 95vw;
+            height: 450px;
+            border: 10px solid white;
+            box-shadow: 10px 10px 0px #000;
+        }
+
+        #success-screen img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <div id="calc-panel">
+            <div class="math-text">RUNNING: FUNCTION </div>
+            <div class="math-text">THETA: <span id="m-theta" class="val">0.000</span></div>
+            <div class="math-text">RADIUS: <span id="m-r" class="val">0.000</span></div>
+            <div class="math-text">COORD: [<span id="m-x" class="val">0</span>,<span id="m-y" class="val">0</span>]</div>
+        </div>
+
+        <canvas id="flowerCanvas" width="500" height="500"></canvas>
+        
+        <div id="proposal-section">
+            <h1>WILL YOU BE MY VALENTINE?</h1>
+            <div class="btn-container">
+                <button id="yes-btn">YES</button>
+                <button id="no-btn">NO?</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-screen">
+        <h1 id="success-header">YOOHOHOHOOOHOHOHOOHOOHOHOH ILYYYY</h1>
+        <div class="wide-img-container">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTvIfuFhazaLXEjDkBgRZp1zjDW6wRXSCeJNg&s" alt="Stretched Cat">
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('flowerCanvas');
+        const ctx = canvas.getContext('2d');
+        const mTheta = document.getElementById('m-theta');
+        const mR = document.getElementById('m-r');
+        const mX = document.getElementById('m-x');
+        const mY = document.getElementById('m-y');
+
+        const centerX = canvas.width / 2;
+        const centerY = 220; 
+        let theta = 0;
+        const k = 5; 
+        const scale = 180;
+
+        ctx.translate(centerX, centerY);
+
+        function animate() {
+            if (theta <= Math.PI) {
+                let r = scale * Math.cos(k * theta);
+                let x = r * Math.cos(theta);
+                let y = r * Math.sin(theta);
+
+                mTheta.innerText = theta.toFixed(3);
+                mR.innerText = (r/scale).toFixed(3);
+                mX.innerText = Math.round(x);
+                mY.innerText = Math.round(y);
+
+                ctx.strokeStyle = '#ff4d6d';
+                ctx.lineWidth = 4;
+                ctx.shadowBlur = 0;
+
+                if (theta === 0) ctx.beginPath();
+                ctx.lineTo(x, y);
+                ctx.stroke();
+
+                theta += 0.012; 
+                requestAnimationFrame(animate);
+            } else {
+                finishFlower();
+            }
+        }
+
+        function finishFlower() {
+            ctx.strokeStyle = '#00ffcc';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, 280);
+            ctx.stroke();
+
+            ctx.fillStyle = '#00ffcc';
+            ctx.fillRect(-40, 140, 40, 10);
+            ctx.fillRect(0, 170, 40, 10);
+
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(-10, -10, 20, 20);
+
+            document.getElementById('proposal-section').style.display = 'block';
+        }
+
+        const yesBtn = document.getElementById('yes-btn');
+        const noBtn = document.getElementById('no-btn');
+        let scaleFactor = 1;
+
+        function moveButton() {
+            scaleFactor += 0.4;
+            yesBtn.style.transform = `scale(${scaleFactor})`;
+            const x = Math.random() * (window.innerWidth - 150);
+            const y = Math.random() * (window.innerHeight - 150);
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = x + 'px';
+            noBtn.style.top = y + 'px';
+        }
+
+        noBtn.addEventListener('mouseover', moveButton); 
+        noBtn.addEventListener('click', moveButton);
+
+        yesBtn.addEventListener('click', () => {
+            document.getElementById('main-container').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+            document.body.style.background = '#ff4d6d';
+        });
+
+        window.onload = animate;
+    </script>
+</body>
+</html>
